@@ -49,6 +49,8 @@ body {
   border: none;
   font-size: 25px;
   margin: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .button.number {
@@ -56,11 +58,30 @@ body {
   color: #fff;
 }
 
+.button.number:hover {
+  background-color: #808080;
+}
+
 .button.math-operation {
   background-color: #EE9406;
   color: #fff;
 }
 
+.button.math-operation:hover {
+  background-color: #fff;
+  color: #EE9406;
+}
+
 .button.wide {
-  width: 140px;
+  width: 150px;
+}
+
+.button.AC {
+  background-color: #A5A5A5;
+  margin-right: 50%;
+  width: 230px;
+}
+
+.button.AC:hover {
+  background-color: #e3e3e3;
 }
