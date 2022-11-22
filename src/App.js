@@ -14,70 +14,54 @@ class App extends React.Component  {
   }
 
   handleClick = (e) => {
-    const { calcStore, operation, currentNumber } = this.state;
+    const { calcStore, currentNumber, lastPressed } = this.state;
     const { innerText } = e.target;
-
-    if (!Number.isNaN(Number(innerText))) {
-      if (currentNumber === '0') {
-        this.setState ({
-          currentNumber: innerText
-        });
-      } else {
-        this.setState ({
-          currentNumber: currentNumber + innerText
-        });
-      }
-      return;
-    }
 
     switch (innerText){
       case 'AC': {
         this.setState({
           currentNumber: '0',
           calcStore: undefined,
-          operation: undefined
         });
         break;
       }
 
-      case '.': {
-        if(!currentNumber.includes('.')) {
-          this.setState({
-            currentNumber: currentNumber + '.'
-          });
-        }
+      case '=': {
+        const evaluated = eval(calcStore);
+        this.setState({
+          currentNumber: evaluated,
+          calcStore: evaluated
+        });
         break;
       }
 
       default: {
-        if(!operation) {
-          this.setState({
-            operation: innerText,
-            calcStore: currentNumber,
-            currentNumber: ''
-          });
-        } else if (innerText === '=') {
-            const evaluated = eval(`${calcStore} ${operation} ${currentNumber}`);
-            this.setState({
-              operation: undefined,
-              currentNumber: evaluated,
-              calcStore: evaluated
-            });
+        let x = undefined;
+        if(operations.includes(lastPressed)) {
+          if (operations.includes(innerText) && innerText !== '-') {
+            x = currentNumber.slice(0, -3) + ` ${innerText} `;
+          } else {
+            x = `${currentNumber} ${innerText} `;
+          }
         } else {
-          this.setState({
-            operation: innerText
-          });
+          x = currentNumber === '0' ? innerText : (currentNumber + innerText);
         }
-      }
+
+        this.setState ({
+          calcStore: x,
+          currentNumber: x,
+          lastPressed: innerText
+        });
     }
   }
+}
 
   render () {
-    const { currentNumber, calcStore, operation } = this.state;
+    const { currentNumber, calcStore } = this.state;
   return (
     <div className='calculator'>
       <div className='calcStore'>
-        { calcStore } { operation }
+        { calcStore }
       </div>
       <div className='display'>
         { currentNumber }
