@@ -2,18 +2,19 @@ import React from 'react'
 import './App.css'
 
 const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0];
-const operations = ['/', 'x', '-', '+', '='];
+const operations = ['/', '*', '-', '+', '='];
 
 class App extends React.Component  {
 
   state = {
-    lastPressed: undefined,
-    prevNumber: undefined,
-    currentNumber: '0'
+    calcStore: undefined,
+    currentNumber: '0',
+    operation: undefined,
+    lastPressed: undefined
   }
 
   handleClick = (e) => {
-    const { lastPressed, prevNumber, currentNumber } = this.state;
+    const { calcStore, operation, currentNumber } = this.state;
     const { innerText } = e.target;
 
     if (!Number.isNaN(Number(innerText))) {
@@ -26,13 +27,15 @@ class App extends React.Component  {
           currentNumber: currentNumber + innerText
         });
       }
+      return;
     }
 
     switch (innerText){
       case 'AC': {
         this.setState({
           currentNumber: '0',
-          prevNumber: undefined
+          calcStore: undefined,
+          operation: undefined
         });
         break;
       }
@@ -42,20 +45,40 @@ class App extends React.Component  {
           this.setState({
             currentNumber: currentNumber + '.'
           });
-          break;
+        }
+        break;
+      }
+
+      default: {
+        if(!operation) {
+          this.setState({
+            operation: innerText,
+            calcStore: currentNumber,
+            currentNumber: ''
+          });
+        } else if (innerText === '=') {
+            const evaluated = eval(`${calcStore} ${operation} ${currentNumber}`);
+            this.setState({
+              operation: undefined,
+              currentNumber: evaluated,
+              calcStore: evaluated
+            });
+        } else {
+          this.setState({
+            operation: innerText
+          });
         }
       }
     }
-
-    this.setState({
-      lastPressed: innerText
-    });
   }
 
   render () {
-    const { currentNumber } = this.state;
+    const { currentNumber, calcStore, operation } = this.state;
   return (
     <div className='calculator'>
+      <div className='calcStore'>
+        { calcStore } { operation }
+      </div>
       <div className='display'>
         { currentNumber }
       </div>
