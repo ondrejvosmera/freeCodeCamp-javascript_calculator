@@ -2,26 +2,28 @@ import React from 'react'
 import './App.css'
 
 const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0];
-const operations = ['/', '*', '-', '+', '='];
+const operations = ['/', '*', '-', '+'];
+
+function toFixedIfNecessary( value, dp ){
+  return +parseFloat(value).toFixed( dp );
+}
 
 class App extends React.Component  {
 
   state = {
-    calcStore: undefined,
-    currentNumber: '0',
+    calcStore: '0',
     operation: undefined,
     lastPressed: undefined
   }
 
   handleClick = (e) => {
-    const { calcStore, currentNumber, lastPressed } = this.state;
+    const { calcStore, lastPressed } = this.state;
     const { innerText } = e.target;
 
     switch (innerText){
       case 'AC': {
         this.setState({
-          currentNumber: '0',
-          calcStore: undefined,
+          calcStore: '0',
         });
         break;
       }
@@ -29,42 +31,51 @@ class App extends React.Component  {
       case '=': {
         const evaluated = eval(calcStore);
         this.setState({
-          currentNumber: evaluated,
-          calcStore: evaluated
+          calcStore: toFixedIfNecessary( evaluated, 5 )
         });
+        break;
+      }
+
+      case '.': {
+        const splitted = calcStore.split(/[\+\-\*\/]/);
+        const last = splitted.slice(-1)[0];
+
+        if(!last.includes('.')) {
+          this.setState ({
+            calcStore: calcStore + '.'
+          });
+        }
         break;
       }
 
       default: {
         let x = undefined;
-        if(operations.includes(lastPressed)) {
-          if (operations.includes(innerText) && innerText !== '-') {
-            x = currentNumber.slice(0, -3) + ` ${innerText} `;
+        if(operations.includes(innerText)) {
+          if (operations.includes(lastPressed) && innerText !== '-') {
+            x = calcStore.slice(0, -3) + ` ${innerText} `;
           } else {
-            x = `${currentNumber} ${innerText} `;
+            x = ` ${calcStore} ${innerText} `;
           }
         } else {
-          x = currentNumber === '0' ? innerText : (currentNumber + innerText);
+          x = (calcStore === '0') ? innerText : (calcStore + innerText);
         }
 
         this.setState ({
-          calcStore: x,
-          currentNumber: x,
-          lastPressed: innerText
+          calcStore: x
         });
     }
   }
+  this.setState ({
+    lastPressed: innerText
+  })
 }
 
   render () {
-    const { currentNumber, calcStore } = this.state;
+    const { calcStore } = this.state;
   return (
-    <div className='calculator'>
-      <div className='calcStore'>
-        { calcStore }
-      </div>
+    <div className='calculator'>x
       <div className='display'>
-        { currentNumber }
+        { calcStore }
       </div>
       <div className='numbers-container'>
         <button className='button AC' onClick={this.handleClick}>AC</button>
@@ -77,6 +88,7 @@ class App extends React.Component  {
         {operations.map(operation => (
           <button key={operation} className='button math-operation' onClick={this.handleClick}>{operation}</button>
         ))}
+        <button className='button math-operation' onClick={this.handleClick}>=</button>
       </div>
     </div>
   )
